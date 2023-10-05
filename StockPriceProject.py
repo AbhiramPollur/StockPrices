@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,81 +23,36 @@ from statsmodels.tsa.arima_model import ARIMA
 from pmdarima import auto_arima
 import statsmodels.api as sm
 
-
-# In[3]:
-
-
 nifty_data = pd.read_csv(r"C:\Users\Abhiram P\Desktop\WissenRC\NIFTY50_all.csv")
 meta_data = pd.read_csv(r"C:\Users\Abhiram P\Desktop\WissenRC\stock_metadata.csv")
 
-
-# In[4]:
-
-
 nifty_data.head(10)
-
-
-# In[5]:
-
-
 nifty_data.shape
-
-
-# In[6]:
-
 
 df1 = nifty_data.dropna()
 df1['Timestamp'] = pd.to_datetime(df1['Date']).astype('int64')//10**9
 df1
 
-
-# In[7]:
-
-
 label = LabelEncoder()
 encoder = OneHotEncoder()
-
-
-# In[8]:
-
 
 df1_dummy = df1
 df1_dummy['Symbol'] = label.fit_transform(df1_dummy['Symbol'])
 df1_dummy['Series'] = label.fit_transform(df1_dummy['Series'])
 df1_dummy
 
-
-# In[9]:
-
-
 x_dummy1_open = df1_dummy[['Symbol', 'Series', 'Prev Close', 'High', 'Low', 'Last', 'Close', 'VWAP', 'Volume', 'Turnover', 'Trades', 'Deliverable Volume', '%Deliverble', 'Timestamp']]
 y_dummy1_open = df1_dummy[['Open']]
 
-
-# In[10]:
-
-
 scaler = MinMaxScaler()
 
-
-# In[11]:
-
-
 xtrain_dummy1_open, xtest_dummy1_open, ytrain_dummy1_open, ytest_dummy1_open = train_test_split(x_dummy1_open, y_dummy1_open, test_size=0.2, random_state=42)
-
-
-# In[12]:
-
 
 xtrain_dummy1_open = scaler.fit_transform(xtrain_dummy1_open)
 xtest_dummy1_open = scaler.transform(xtest_dummy1_open)
 
 xtrain_dummy1_open = xtrain_dummy1_open.reshape(xtrain_dummy1_open.shape[0], 1, xtrain_dummy1_open.shape[1])
 xtest_dummy1_open = xtest_dummy1_open.reshape(xtest_dummy1_open.shape[0], 1, xtest_dummy1_open.shape[1])
-
-
-# In[13]:
-
 
 model1 = Sequential()
 
@@ -118,22 +67,11 @@ model1.add(Dropout(0.2))
 model1.add(Dense(units=1))
 model1.compile(loss='mean_squared_error', optimizer='adam', metrics=['mean_absolute_error'])
 
-model1.summary()
-
 model1.compile(optimizer=Adam(learning_rate=(0.001)), loss='mean_squared_error')
-
-
-
 
 model1.fit(xtrain_dummy1_open, ytrain_dummy1_open, epochs=100, validation_split=0.2, batch_size=32)
 
-
-
-
 from keras.layers import RNN, Conv1D
-
-
-
 
 def prepare_sequences(df1, n_steps):
     xdf1, ydf1 = [], []
@@ -144,16 +82,8 @@ def prepare_sequences(df1, n_steps):
 
 n_steps=10
 
-
-# In[18]:
-
-
 x_train_seq, y_train_seq = prepare_sequences(ytrain_dummy1_open.values, n_steps)
 x_test_seq, y_test_seq = prepare_sequences(ytest_dummy1_open.values, n_steps)
-
-
-# In[19]:
-
 
 model2 = Sequential()
 
@@ -161,34 +91,17 @@ model2.add(LSTM(units=64, input_shape=(x_train_seq.shape[1], 1), return_sequence
 model2.add(LSTM(units=32, return_sequences=True))
 model2.add(Dense(units=1))
 
-
-# In[20]:
-
-
 model2.compile(optimizer='adam', loss='mean_squared_error')
-
-
-# In[21]:
-
 
 hist2 = model2.fit(x_train_seq, y_train_seq, epochs=50, batch_size=32, validation_split=0.2)
 
-
-# In[22]:
-
-
 df = df1
-
-
-# In[23]:
-
 
 import pandas as pd
 import numpy as np
 from pmdarima import auto_arima
 from sklearn.preprocessing import StandardScaler
 import statsmodels.api as sm
-
 
 time_series_column = 'Close'
 y = df[time_series_column].values
@@ -214,16 +127,7 @@ forecast = scaler.inverse_transform(forecast)
 
 print("Forecasts:", forecast)
 
-
-# In[24]:
-
-
 df1.tail()
-
-
-# In[25]:
-
-
 
 tail_50_data = df.tail(50)
 
@@ -252,37 +156,14 @@ print(f"Mean Squared Error (MSE): {mse}")
 print(f"Root Mean Squared Error (RMSE): {rmse}")
 print(f"Mean Absolute Percentage Error (MAPE): {mape}%")
 
-
-
-# In[26]:
-
-
-nifty_data
-
-
-# In[28]:
-
-
 df2 = nifty_data
 
-
-# In[29]:
-
-
 df2.isna().sum()
-
-
-# In[30]:
-
 
 df2['Trades'] = df2['Trades'].fillna(nifty_data['Trades'].mean())
 df2['Deliverable Volume'] = nifty_data['Trades'].fillna(nifty_data['Deliverable Volume'].mean())
 df2['%Deliverble'] = nifty_data['%Deliverble'].fillna(nifty_data['%Deliverble'].mean())
 df2
-
-
-# In[31]:
-
 
 time_series_column = 'Close'
 y = df2[time_series_column].values
@@ -318,12 +199,9 @@ company_datasets = {}
 
 for company in unique_companies:
     company_df = df2[df2['Symbol'] == company]
-    
     company_datasets[company] = company_df
 
-
 df2['Symbol'].unique()
-
 
 mundraport = company_datasets['MUNDRAPORT']
 adaniports = company_datasets['ADANIPORTS']
@@ -11478,10 +11356,4 @@ print(f"Low Mean Absolute Error (MAE): {mundraport_low_mae}")
 print(f"Low Mean Squared Error (MSE): {mundraport_low_mse}")
 print(f"Low Root Mean Squared Error (RMSE): {mundraport_low_rmse}")
 print(f"Low Mean Absolute Percentage Error (MAPE): {mundraport_low_mape}")
-
-
-# In[ ]:
-
-
-
 
