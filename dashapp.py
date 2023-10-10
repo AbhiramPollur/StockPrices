@@ -157,7 +157,10 @@ app = dash.Dash(__name__, external_stylesheets=['https://codepen.io/chriddyp/pen
 # Layout of the app
 app.layout = html.Div(style={'font-family': 'Arial, sans-serif', 'max-width': '100%', 'margin': 'auto', 'background-color': '#f4f4f4', 'margin-left': '0', 'margin-right': '0'}, children=[
     html.H1("Stock Price Prediction", style={'text-align': 'center', 'margin-bottom': '20px'}),
-
+    html.Img(
+        src="https://cdn.pixabay.com/photo/2017/10/05/09/37/equalizer-2818803_1280.jpg",
+        style={'width': '100%', 'height': '200px', 'object-fit': 'cover'}
+    ),
     dcc.Dropdown(
         id='company-dropdown',
         options=[{'label': company, 'value': company} for company in company_datasets.keys()],
